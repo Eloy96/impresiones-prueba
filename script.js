@@ -92,6 +92,22 @@ function setupCarouselListeners() {
     }
 }
 
+/**
+ * Aplica la animación de fade-in a los elementos de producto.
+ * Esto asegura que las capas de producto aparezcan con un efecto suave.
+ */
+function applyFadeInEffects() {
+    // Retrasar la aplicación de la clase 'visible' para activar la transición CSS
+    setTimeout(() => {
+        document.querySelectorAll('.product-item').forEach((item, index) => {
+             // Retraso escalonado para un efecto más agradable
+             setTimeout(() => {
+                item.classList.add('visible');
+            }, index * 100); 
+        });
+    }, 50);
+}
+
 
 // --- FUNCIONES DE UTILIDAD (DOM Y NAVEGACIÓN PROGRESIVA) ---
 
@@ -123,6 +139,7 @@ function navigate(viewId) {
         setupCarouselListeners();
         showSlide(0);
         initializeLumenTitle(); // Asegurar que el título esté estilizado
+        applyFadeInEffects(); // Disparar el efecto de fade-in al navegar al home
     }
 
     // 4. Actualizar el contador del carrito
