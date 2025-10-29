@@ -1,0 +1,1408 @@
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<!-- Cargar Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script><!-- NUEVA BIBLIOTECA: PDF.js para el visor --><!-- CORRECCIÓN: 'xintegrity' cambiado a 'integrity' --><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js" xintegrity="sha512-tqaIiFJopq4cETDARe32o+ZJ1o3iJCOYQGVMs3t2yEacV/E6FChacwSFLIE9DLSGGn2Tw2IQtTBy0AAmw4sS1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script>
+        // Configurar el "worker" para PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+<style type="text/css">/* Estilo para las "vistas" de la app */
+        .app-view {
+            display: none; /* Ocultas por defecto */
+        }
+        .app-view.active {
+            display: block; /* Visible */
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Animación simple */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ocultar scrollbar del carrusel */
+        .horizontal-scroll-container {
+            -ms-overflow-style: none;  /* IE y Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .horizontal-scroll-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari y Opera */
+        }
+
+        /* --- NUEVOS ESTILOS PARA LA VISTA DE CONFIGURACIÓN --- */
+        
+        /* Estilos para el botón de "Subir Archivo" */
+        .file-input-label {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-input-label:hover {
+            opacity: 0.9;
+        }
+
+        /* Estilos para la zona de arrastrar y soltar (drag & drop) */
+        .drop-zone {
+            border: 2px dashed #cbd5e1; /* gray-300 */
+            transition: all 0.3s ease;
+        }
+        .drop-zone.drag-over {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+
+        /* Estilo para el botón de 'Añadir al carrito' deshabilitado */
+        button:disabled,
+        button[disabled] {
+            background-color: #d1d5db; /* gray-300 */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Estilos para el Resumen (sidebar) */
+        .summary-section {
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .summary-section:last-of-type {
+            border-bottom: none;
+        }
+        
+        /* Ocultar los paneles de pasos por defecto */
+        .step-panel {
+            display: none;
+        }
+        .step-panel.active {
+            display: block;
+        }
+
+        /* Estilos para la navegación de pasos */
+        .step-nav-btn.active {
+            border-bottom-width: 2px;
+            border-color: #2563eb; /* blue-600 */
+            color: #2563eb; /* blue-600 */
+            font-weight: 600;
+        }
+        .step-nav-btn.disabled {
+            color: #9ca3af; /* gray-400 */
+            cursor: not-allowed;
+        }
+        .step-nav-btn:not(.active):not(.disabled) {
+            color: #6b7280; /* gray-500 */
+            cursor: pointer;
+        }
+        
+        /* --- NUEVOS ESTILOS PARA EL VISOR PDF --- */
+        #pdf-viewer-container {
+            border: 1px solid #d1d5db; /* gray-300 */
+            background-color: #f9fafb; /* gray-50 */
+            overflow: auto; /* Permitir scroll si el PDF es grande */
+            max-height: 600px;
+        }
+        #pdf-canvas {
+            width: 100%; /* Ajustado al contenedor */
+            border-bottom: 1px solid #d1d5db;
+        }
+        #pdf-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.75rem; /* 12px */
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        #pdf-controls button {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 600;
+        }
+        #pdf-controls button:disabled {
+            background-color: #9ca3af; /* gray-400 */
+            cursor: not-allowed;
+        }
+        #pdf-page-info {
+            margin: 0 1rem; /* 16px */
+            font-medium: 600;
+        }
+        /* --- FIN DE NUEVOS ESTILOS --- */
+</style>
+<!-- 
+      =============================================
+      CONTENEDOR PRINCIPAL
+    =============================================
+    -->
+<div class="container mx-auto p-4 md:p-8 max-w-7xl"><!-- 
+          ENCABEZADO FIJO (Simulado)
+          Incluye el logo y el carrito
+        -->
+<header class="bg-white rounded-lg shadow-lg p-4 flex justify-between items-center mb-6 md:sticky top-4 z-50"><!-- Logo (placeholder) --><a class="app-link" data-target-view="view-home" href="#"><!-- CAMBIO: Título actualizado --> </a>
+<h1 class="text-2xl font-bold text-blue-700"><a class="app-link" data-target-view="view-home" href="#">Servicio de impresion y copiado Lumen</a></h1>
+<a class="app-link" data-target-view="view-home" href="#"> </a> <!-- Icono de Carrito --><button class="relative text-gray-700 hover:text-blue-700 transition-colors" id="cart-button"><!-- Icono SVG de Carrito --><svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> <!-- Contador de items --> <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden" id="cart-count"> 0 </span></button></header>
+<!-- 
+          =============================================
+          VISTA 1: HOME (PÁGINA PRINCIPAL)
+          (Visible por defecto)
+          =============================================
+        -->
+
+<section class="app-view active" id="view-home"><!-- 1. Banner Principal -->
+<div class="bg-blue-600 text-white rounded-lg shadow-xl overflow-hidden mb-8" style="height: 360px;"><!-- Imagen de fondo (placeholder) --><img alt="Banner Principal" class="w-full h-full object-cover" src="https://placehold.co/1200x360/3b82f6/ffffff?text=Tu+Servicio+de+Impresión" /></div>
+<!-- 2. Menú Secundario (Categorías) -->
+
+<nav class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+<h2 class="text-xl font-semibold mb-4 text-gray-800">Nuestros Servicios</h2>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4"><a class="app-link p-4 bg-gray-100 rounded-lg text-center font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-category-id="impresiones" data-target-view="view-category" href="#">Impresiones </a> <a class="app-link p-4 bg-gray-100 rounded-lg text-center font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-category-id="copias" data-target-view="view-category" href="#"> Copias </a> <a class="app-link p-4 bg-gray-100 rounded-lg text-center font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-category-id="engargolado" data-target-view="view-category" href="#"> Engargolado </a> <a class="app-link p-4 bg-gray-100 rounded-lg text-center font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-category-id="enmicado" data-target-view="view-category" href="#"> Enmicado </a></div>
+</nav>
+<!-- 3. Carrusel "Lo Más Vendido" -->
+
+<div>
+<h2 class="text-2xl font-semibold mb-6 text-gray-800">Lo M&aacute;s Vendido</h2>
+
+<div class="horizontal-scroll-container flex overflow-x-auto gap-6 pb-4"><!-- Item 1 -->
+<div class="bg-white rounded-full shadow-md w-32 h-32 mx-auto mb-2 overflow-hidden border-4 border-white"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-001" data-product-title="Impresión B/N (Carta)" data-target-view="view-product-detail" href="#"><img alt="Impresión B/N" class="w-full h-full object-cover" src="https://placehold.co/128x128/eeeeee/333333?text=B/N" /> </a></div>
+
+<h3 class="font-medium text-gray-700"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-001" data-product-title="Impresión B/N (Carta)" data-target-view="view-product-detail" href="#">Impresi&oacute;n B/N</a></h3>
+
+<p class="text-sm text-gray-500"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-001" data-product-title="Impresión B/N (Carta)" data-target-view="view-product-detail" href="#">$1.00 c/u</a></p>
+<!-- Item 2 -->
+
+<div class="bg-white rounded-full shadow-md w-32 h-32 mx-auto mb-2 overflow-hidden border-4 border-white"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-002" data-product-title="Impresión Color (Carta)" data-target-view="view-product-detail" href="#"><img alt="Impresión Color" class="w-full h-full object-cover" src="https://placehold.co/128x128/fca5a5/333333?text=Color" /> </a></div>
+
+<h3 class="font-medium text-gray-700"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-002" data-product-title="Impresión Color (Carta)" data-target-view="view-product-detail" href="#">Impresi&oacute;n Color</a></h3>
+
+<p class="text-sm text-gray-500"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-002" data-product-title="Impresión Color (Carta)" data-target-view="view-product-detail" href="#">$3.00 c/u</a></p>
+<!-- Item 3 -->
+
+<div class="bg-white rounded-full shadow-md w-32 h-32 mx-auto mb-2 overflow-hidden border-4 border-white"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-003" data-product-title="Engargolado Espiral" data-target-view="view-product-detail" href="#"><img alt="Engargolado" class="w-full h-full object-cover" src="https://placehold.co/128x128/a5b4fc/333333?text=Engargolado" /> </a></div>
+
+<h3 class="font-medium text-gray-700"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-003" data-product-title="Engargolado Espiral" data-target-view="view-product-detail" href="#">Engargolado</a></h3>
+
+<p class="text-sm text-gray-500"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-003" data-product-title="Engargolado Espiral" data-target-view="view-product-detail" href="#">$25.00</a></p>
+<!-- Item 4 -->
+
+<div class="bg-white rounded-full shadow-md w-32 h-32 mx-auto mb-2 overflow-hidden border-4 border-white"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-004" data-product-title="Enmicado (Carta)" data-target-view="view-product-detail" href="#"><img alt="Enmicado" class="w-full h-full object-cover" src="https://placehold.co/128x128/99f6e4/333333?text=Enmicado" /> </a></div>
+
+<h3 class="font-medium text-gray-700"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-004" data-product-title="Enmicado (Carta)" data-target-view="view-product-detail" href="#">Enmicado</a></h3>
+
+<p class="text-sm text-gray-500"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-004" data-product-title="Enmicado (Carta)" data-target-view="view-product-detail" href="#">$15.00</a></p>
+<!-- Item 5 (placeholder) -->
+
+<div class="bg-white rounded-full shadow-md w-32 h-32 mx-auto mb-2 overflow-hidden border-4 border-white"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-005" data-product-title="Copia B/N (Carta)" data-target-view="view-product-detail" href="#"><img alt="Copia" class="w-full h-full object-cover" src="https://placehold.co/128x128/d1d5db/333333?text=Copia" /> </a></div>
+
+<h3 class="font-medium text-gray-700"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-005" data-product-title="Copia B/N (Carta)" data-target-view="view-product-detail" href="#">Copia B/N</a></h3>
+
+<p class="text-sm text-gray-500"><a class="app-link flex-shrink-0 w-40 text-center" data-product-id="prod-005" data-product-title="Copia B/N (Carta)" data-target-view="view-product-detail" href="#">$0.80 c/u</a></p>
+</div>
+</div>
+<!-- 4. Secciones Legales (Links) -->
+
+<footer class="text-center mt-12 py-6 border-t border-gray-300"><a class="app-link text-sm text-gray-600 hover:underline mx-2" data-target-view="view-terms" href="#">T&eacute;rminos y Condiciones</a> <span class="text-gray-400">|</span> <a class="app-link text-sm text-gray-600 hover:underline mx-2" data-target-view="view-privacy" href="#">Aviso de Privacidad</a></footer>
+</section>
+<!-- 
+          =============================================
+          VISTA 2: DETALLE DE CATEGORÍA
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-category"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-home" href="#">&larr; Volver al inicio</a>
+
+<h1 class="text-3xl font-bold mb-6" id="category-title">Categor&iacute;a</h1>
+
+<p class="mb-6 text-gray-600">Estas son las sub-categor&iacute;as disponibles.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6"><!-- Ejemplo de Sub-categoría -->
+<h2 class="text-xl font-semibold text-blue-700"><a class="app-link block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" data-product-id="prod-001" data-product-title="Impresión B/N (Carta)" data-target-view="view-product-detail" href="#">Impresi&oacute;n Blanco y Negro</a></h2>
+
+<p class="text-gray-600 mt-2"><a class="app-link block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" data-product-id="prod-001" data-product-title="Impresión B/N (Carta)" data-target-view="view-product-detail" href="#">Ideal para documentos, tareas y lecturas.</a></p>
+
+<h2 class="text-xl font-semibold text-blue-700"><a class="app-link block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" data-product-id="prod-002" data-product-title="Impresión Color (Carta)" data-target-view="view-product-detail" href="#">Impresi&oacute;n a Color</a></h2>
+
+<p class="text-gray-600 mt-2"><a class="app-link block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" data-product-id="prod-002" data-product-title="Impresión Color (Carta)" data-target-view="view-product-detail" href="#">Para presentaciones y gr&aacute;ficos con alta calidad.</a></p>
+</div>
+</section>
+<!-- 
+          =============================================
+          VISTA 3: DETALLE DE SERVICIO
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-product-detail"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-category" href="#">&larr; Volver a Categor&iacute;as</a>
+
+<div class="bg-white rounded-lg shadow-xl p-6 md:p-8 overflow-hidden">
+<div class="md:flex md:gap-8"><!-- Columna de Imagen -->
+<div class="md:w-1/2 mb-6 md:mb-0"><img alt="Imagen del Producto" class="w-full h-auto rounded-lg shadow-md object-cover" id="product-image" src="https://placehold.co/500x500/e0e7ff/333333?text=Producto" /></div>
+<!-- Columna de Información -->
+
+<div class="md:w-1/2">
+<h1 class="text-3xl md:text-4xl font-bold mb-4" id="product-title">Nombre del Producto</h1>
+
+<p class="text-gray-600 text-lg mb-6">Entrega: <span class="font-semibold text-blue-700">Solo en Sucursal</span></p>
+
+<p class="mb-6 text-gray-700">Configura tu producto antes de a&ntilde;adirlo al carrito. Sube tus archivos y selecciona las opciones de impresi&oacute;n.</p>
+<!-- Botones de Acción -->
+
+<div class="flex flex-col gap-4"><button class="w-full bg-white border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-50 transition-colors" id="show-price-modal-btn">Consultar Precios</button><a class="app-link w-full text-center bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors" data-target-view="view-config" href="#">Configurar Pedido </a></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 
+          =============================================
+          VISTA 4: CONFIGURACIÓN DE PRODUCTO
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-config"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-product-detail" href="#">&larr; Volver a Detalle</a>
+
+<div class="md:flex md:flex-row-reverse md:gap-8"><!-- 
+                  COLUMNA DERECHA: RESUMEN DE COMPRA (Sticky)
+                  Recrea la barra lateral de la imagen.
+                -->
+<aside class="md:w-1/3 lg:w-1/4 w-full mb-8 md:mb-0">
+<div class="bg-white rounded-lg shadow-lg p-4 md:sticky md:top-24">
+<h2 class="text-xl font-bold border-b border-gray-300 pb-3 mb-3">Resumen</h2>
+<!-- Sección Archivos -->
+
+<div class="summary-section py-3">
+<h3 class="font-semibold text-gray-800">ARCHIVOS</h3>
+
+<div class="text-sm text-gray-600 mt-2">
+<p class="truncate" id="summary-file-name">Ning&uacute;n archivo subido</p>
+
+<p class="mt-1">Formatos admitidos: PDF, JPG, etc.</p>
+</div>
+</div>
+<!-- Sección Impresión -->
+
+<div class="summary-section py-3">
+<h3 class="font-semibold text-gray-800">IMPRESI&Oacute;N</h3>
+
+<div class="text-sm text-gray-600 mt-2 space-y-1">
+<p>Cantidad: <span class="font-medium text-gray-900" id="summary-cantidad">0</span></p>
+
+<p>Precio por p&aacute;gina: <span class="font-medium text-gray-900" id="summary-page-price">$ 0.00</span></p>
+
+<p>Color de impresi&oacute;n: <span class="font-medium text-gray-900" id="summary-color">Color</span></p>
+
+<p>Tipo de papel: <span class="font-medium text-gray-900" id="summary-paper">Papel bond</span></p>
+
+<p>Tama&ntilde;o: <span class="font-medium text-gray-900" id="summary-size">Carta</span></p>
+
+<p>Imprimir a: <span class="font-medium text-gray-900" id="summary-sides">Una cara</span></p>
+</div>
+</div>
+<!-- Sección Precio -->
+
+<div class="summary-section py-3">
+<h3 class="font-semibold text-gray-800">PRECIO</h3>
+
+<div class="text-sm text-gray-600 mt-2 space-y-1">
+<div class="flex justify-between"><span>Impresi&oacute;n:</span> <span class="font-medium text-gray-900" id="summary-subtotal">$ 0.00</span></div>
+
+<div class="flex justify-between"><span>Total:</span> <span class="font-medium text-gray-900" id="summary-section-total">$ 0.00</span></div>
+</div>
+</div>
+<!-- Total Final -->
+
+<div class="flex justify-between items-center py-4 text-xl font-bold"><span>TOTAL</span> <span id="summary-final-total">$ 0.00</span></div>
+<!-- Botón Añadir al Carrito --><button class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors" disabled="disabled" id="add-to-cart-btn">A&ntilde;adir al carrito</button></div>
+</aside>
+<!-- 
+                  COLUMNA IZQUIERDA: PASOS DE CONFIGURACIÓN
+                -->
+
+<main class="md:w-2/3 lg:w-3/4 w-full">
+<h1 class="text-3xl font-bold mb-6">Configurar Producto</h1>
+<!-- Navegación de Pasos -->
+
+<nav class="flex border-b border-gray-300 mb-6"><button class="step-nav-btn p-4 active" id="step-nav-1">1. Sube tu archivo</button><button class="step-nav-btn p-4 disabled" id="step-nav-2">2. Visor</button><button class="step-nav-btn p-4 disabled" id="step-nav-3">3. Configuraci&oacute;n</button></nav>
+<!-- Panel Paso 1: Subir Archivo -->
+
+<div class="step-panel active" id="step-panel-1">
+<h2 class="text-xl font-semibold mb-4">Sube tu archivo para configurar las opciones de impresi&oacute;n.</h2>
+
+<div class="drop-zone bg-white rounded-lg p-8 text-center flex flex-col items-center" id="drop-zone">
+<p class="mb-4 text-gray-600">Pulsa el bot&oacute;n o arrastra tu archivo.</p>
+<!-- Input de archivo real, oculto --><input accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.ppt,.pptx,.xls,.xlsx" class="hidden" id="file-input" type="file" /> <!-- Botón rojo (label) para el input --> <label class="file-input-label inline-flex items-center justify-center bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg shadow-md" for="file-input"> <!-- Icono de subida (SVG) --> <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> Subir archivo </label>
+
+<p class="text-sm text-gray-500 mt-4">Tama&ntilde;o m&aacute;ximo admitido: <strong>100MB</strong></p>
+
+<p class="text-sm text-gray-500 mt-1">Formatos admitidos: <strong>PDF</strong>, Word, JPG, PPT, etc.</p>
+</div>
+<!-- Mensaje de error para el archivo -->
+
+<p class="text-red-600 mt-4 hidden" id="file-error-msg">&nbsp;</p>
+</div>
+<!-- Panel Paso 2: Visor (Oculto) -->
+
+<div class="step-panel" id="step-panel-2">
+<h2 class="text-xl font-semibold mb-4">2. Visor de Archivo</h2>
+
+<p class="mb-4">Tu archivo ha sido cargado.</p>
+
+<div class="bg-white rounded-lg shadow-md p-4 min-h-[400px]">
+<p class="text-gray-600" id="visor-placeholder">No hay previsualizaci&oacute;n disponible para este tipo de archivo.</p>
+<!-- El visor se mostrará aquí --><iframe class="w-full h-[600px] border hidden" id="file-visor-iframe" title="Visor de Archivo"></iframe><!-- NUEVO: Contenedor del Visor PDF -->
+
+<div class="hidden" id="pdf-viewer">
+<div id="pdf-viewer-container"><canvas id="pdf-canvas"></canvas></div>
+
+<div id="pdf-controls"><button id="pdf-prev">&larr; Anterior</button><span id="pdf-page-info">P&aacute;gina <span id="pdf-page-num">1</span> de <span id="pdf-page-count">1</span></span><button id="pdf-next">Siguiente &rarr;</button></div>
+</div>
+</div>
+<button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg" id="visor-next-btn">Siguiente a Configuraci&oacute;n &rarr;</button></div>
+<!-- Panel Paso 3: Configuración (Oculto) -->
+
+<div class="step-panel" id="step-panel-3">
+<h2 class="text-xl font-semibold mb-4">3. Configuraci&oacute;n de Impresi&oacute;n</h2>
+
+<p class="mb-4">Define las opciones para tu archivo.</p>
+
+<div class="bg-white rounded-lg shadow-md p-6 grid grid-cols-1 md:grid-cols-2 gap-6"><!-- Opciones de Configuración -->
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-cantidad">Cantidad (juegos)</label> <input class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-cantidad" min="1" name="config-cantidad" type="number" value="1" /></div>
+<!-- NUEVO: Input para Conteo de Páginas (para Word, PPT, etc.) -->
+
+<div class="form-group" id="config-pages-wrapper"><label class="block text-sm font-medium text-gray-700" for="config-pages">Total de P&aacute;ginas</label> <input class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-pages" min="1" name="config-pages" type="number" value="1" />
+<p class="text-xs text-gray-500 mt-1" id="config-pages-help">Por favor, confirma el total de p&aacute;ginas de tu documento.</p>
+</div>
+
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-color">Color de Impresi&oacute;n</label> <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-color" name="config-color"><option value="b/n">Blanco y Negro</option><option selected="selected" value="color">Color</option> </select></div>
+
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-paper">Tipo de Papel</label> <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-paper" name="config-paper"><option selected="selected" value="bond">Papel Bond</option><option value="opalina">Opalina</option><option value="couche">Couch&eacute;</option> </select></div>
+
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-size">Tama&ntilde;o</label> <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-size" name="config-size"><option selected="selected" value="carta">Carta (8.5&quot; x 11&quot;)</option><option value="oficio">Oficio (8.5&quot; x 13&quot;)</option><option value="tabloide">Tabloide (11&quot; x 17&quot;)</option> </select></div>
+
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-sides">Imprimir a:</label> <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-sides" name="config-sides"><option selected="selected" value="una cara">Una cara</option><option value="dos caras">Ambas caras (D&uacute;plex)</option> </select></div>
+
+<div class="form-group"><label class="block text-sm font-medium text-gray-700" for="config-rango">Rango de P&aacute;ginas</label> <input class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="config-rango" name="config-rango" placeholder="Ej: 1-5, 8, 11-12" type="text" />
+<p class="text-xs text-gray-500 mt-1">D&eacute;jalo en blanco para imprimir todo el documento.</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</section>
+<!-- 
+          =============================================
+          VISTA 5: CHECKOUT (CARRITO Y PAGO)
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-checkout"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-home" href="#">&larr; Volver y seguir comprando</a>
+
+<h1 class="text-3xl font-bold mb-6">Confirmaci&oacute;n de Pedido</h1>
+
+<div class="md:flex md:gap-8"><!-- Columna Izquierda: Items y Formulario -->
+<main class="md:w-2/3 w-full">
+<h2 class="text-2xl font-semibold mb-4">Tu Pedido</h2>
+<!-- Contenedor para los items del carrito -->
+
+<div class="space-y-4" id="checkout-items-container"><!-- Los items del carrito se cargarán aquí dinámicamente -->
+<p class="text-gray-600">Cargando tu carrito...</p>
+</div>
+<!-- Formulario de Datos del Cliente -->
+
+<div class="bg-white rounded-lg shadow-md p-6 mt-8">
+<h2 class="text-2xl font-semibold mb-4">Datos de Entrega</h2>
+
+<form class="space-y-4" id="checkout-form">
+<div><label class="block text-sm font-medium text-gray-700" for="checkout-nombre">Nombre Completo</label> <input class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="checkout-nombre" name="checkout-nombre" required="" type="text" /></div>
+
+<div><label class="block text-sm font-medium text-gray-700" for="checkout-telefono">Tel&eacute;fono</label> <input class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="checkout-telefono" name="checkout-telefono" required="" type="tel" /></div>
+
+<div><label class="block text-sm font-medium text-gray-700" for="checkout-sucursal">Sucursal de Recolecci&oacute;n</label> <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" id="checkout-sucursal" name="checkout-sucursal" required=""><option disabled="disabled" selected="selected" value="">Selecciona una sucursal</option> <!-- Estas sucursales DEBEN coincidir con tu Google Script --><option value="Sucursal 54">Sucursal 54</option><option value="Sucursal Relox">Sucursal Relox</option><option value="Sucursal Puebla">Sucursal Puebla</option> </select></div>
+<input id="checkout-metodo" type="hidden" value="tienda" />&nbsp;</form>
+</div>
+</main>
+<!-- Columna Derecha: Resumen de Pago (Sticky) -->
+
+<aside class="md:w-1/3 w-full mt-8 md:mt-0">
+<div class="bg-white rounded-lg shadow-lg p-6 md:sticky md:top-24">
+<h2 class="text-2xl font-semibold mb-4">Resumen de Pago</h2>
+
+<div class="space-y-2 border-b border-gray-200 pb-4">
+<div class="flex justify-between"><span class="text-gray-600">Subtotal:</span> <span class="font-semibold text-gray-900" id="checkout-subtotal">$ 0.00</span></div>
+
+<div class="flex justify-between"><span class="text-gray-600">Env&iacute;o (Recolecci&oacute;n):</span> <span class="font-semibold text-green-600">Gratis</span></div>
+</div>
+
+<div class="flex justify-between items-center py-4 text-xl font-bold"><span>TOTAL:</span> <span id="checkout-total">$ 0.00</span></div>
+<!-- Checkbox de Términos -->
+
+<div class="mt-4"><label class="flex items-center" for="terms-checkbox"><input class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" id="terms-checkbox" type="checkbox" /> <span class="ml-2 text-sm text-gray-600"> He le&iacute;do y acepto los <a class="app-link text-blue-600 hover:underline" data-target-view="view-terms" href="#">T&eacute;rminos y Condiciones</a>. </span> </label></div>
+<!-- Botón de Pago / Envío -->
+
+<p class="text-sm text-gray-500 mt-4">Aqu&iacute; se conectar&aacute; Conekta para el pago.</p>
+<button class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors mt-4" disabled="disabled" id="submit-order-btn">Pagar y Enviar Pedido</button>
+
+<div class="text-red-600 text-sm mt-4 hidden" id="checkout-error-msg">&nbsp;</div>
+</div>
+</aside>
+</div>
+</section>
+<!-- 
+          =============================================
+          VISTA 6: PÁGINA DE GRACIAS
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-thanks">
+<div class="bg-white rounded-lg shadow-xl p-8 md:p-12 text-center max-w-2xl mx-auto"><!-- Icono de Éxito (SVG) --><svg class="w-16 h-16 mx-auto text-green-500 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+
+<h1 class="text-3xl font-bold mb-4">&iexcl;Gracias por tu pedido!</h1>
+
+<p class="text-gray-600 text-lg mb-6">Hemos recibido tu pedido correctamente. Recibir&aacute;s un correo de confirmaci&oacute;n en breve.</p>
+
+<div class="bg-gray-100 rounded-lg p-4">
+<p class="text-gray-700">Tu n&uacute;mero de folio es:</p>
+
+<p class="text-2xl font-bold text-blue-700 mt-1" id="folio-number">LMN-XXXXX</p>
+</div>
+<a class="app-link inline-block mt-8 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-colors" data-target-view="view-home" href="#"> Volver al inicio </a></div>
+</section>
+<!-- 
+          =============================================
+          VISTA 7: TÉRMINOS Y CONDICIONES
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-terms"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-home" href="#">&larr; Volver al inicio</a>
+
+<div class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+<h1 class="text-3xl font-bold mb-6">T&eacute;rminos y Condiciones</h1>
+
+<div class="prose max-w-none text-gray-700 space-y-4">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+
+<h2 class="text-xl font-semibold">1. Uso del Servicio</h2>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas scelerisque, sapien vel finibus facilisis, eros risus finibus purus, ac scelerisque nisi libero ut sapien.</p>
+
+<h2 class="text-xl font-semibold">2. Pagos y Env&iacute;os</h2>
+
+<p>El pago se realiza a trav&eacute;s de Conekta. La entrega es &uacute;nicamente en la sucursal seleccionada.</p>
+</div>
+</div>
+</section>
+<!-- 
+          =============================================
+          VISTA 8: AVISO DE PRIVACIDAD
+          (Oculta por defecto)
+          =============================================
+        -->
+
+<section class="app-view" id="view-privacy"><a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-home" href="#">&larr; Volver al inicio</a>
+
+<div class="bg-white rounded-lg shadow-xl p-6 md:p-8">
+<h1 class="text-3xl font-bold mb-6">Aviso de Privacidad</h1>
+
+<div class="prose max-w-none text-gray-700 space-y-4">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. ...</p>
+
+<p>Sus datos personales (nombre, tel&eacute;fono) se utilizan &uacute;nicamente para procesar su pedido y notificarle cuando est&eacute; listo.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- 
+      =============================================
+      MODAL DE PRECIOS
+      (Oculto por defecto)
+      =============================================
+    -->
+
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden" id="price-modal">
+<div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative"><button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" id="close-price-modal-btn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+
+<h2 class="text-2xl font-bold mb-4">Lista de Precios</h2>
+
+<p class="text-gray-700">Aqu&iacute; se cargar&aacute; la imagen o la tabla de precios...</p>
+</div>
+</div>
+<!-- 
+      =============================================
+      NUEVO MODAL: "PRODUCTO AÑADIDO"
+      (Oculto por defecto)
+      =============================================
+    -->
+
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden" id="add-to-cart-modal">
+<div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center"><!-- Icono de Éxito (SVG) --><svg class="w-12 h-12 mx-auto text-green-500 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+
+<h2 class="text-2xl font-bold mb-4">&iexcl;Producto A&ntilde;adido!</h2>
+
+<p class="text-gray-600 text-lg mb-6">Tu producto se ha a&ntilde;adido al carrito.</p>
+
+<div class="flex flex-col gap-4"><button class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors" id="modal-go-to-cart-btn">Ir al carrito</button><button class="w-full bg-white border-2 border-blue-600 text-blue-600 font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-50 transition-colors" id="modal-add-another-btn">Configurar otro producto</button></div>
+</div>
+</div>
+<!-- 
+      =============================================
+      SCRIPT PRINCIPAL DE LA APLICACIÓN
+      =============================================
+    --><script>
+        // --- URL DE TU GOOGLE SCRIPT ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxk0WSkH7lFuV9rz5H9BJ-28HkRaMTeHchzTVkfJMYahaG0xxakjtG2fPkE21Lcq9ZIow/exec';
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- ESTADO GLOBAL DE LA APP ---
+            const appState = {
+                currentView: 'view-home',
+                cart: [],
+                // Aquí guardaremos datos del producto/categoría que se esté viendo
+                currentProduct: null, 
+                currentCategory: null,
+                editingItemId: null // <-- Para saber qué item estamos editando
+            };
+
+            // --- ELEMENTOS DEL DOM ---
+            const views = document.querySelectorAll('.app-view');
+            const appLinks = document.querySelectorAll('.app-link');
+            const priceModal = document.getElementById('price-modal');
+            const showPriceModalBtn = document.getElementById('show-price-modal-btn');
+            const closePriceModalBtn = document.getElementById('close-price-modal-btn');
+            const cartCountEl = document.getElementById('cart-count');
+            const cartButton = document.getElementById('cart-button');
+
+            // --- NUEVOS ELEMENTOS DEL DOM (MODAL AÑADIR CARRITO) ---
+            const addToCartModal = document.getElementById('add-to-cart-modal');
+            const modalGoToCartBtn = document.getElementById('modal-go-to-cart-btn');
+            const modalAddAnotherBtn = document.getElementById('modal-add-another-btn');
+
+            // --- ELEMENTOS DEL DOM (CHECKOUT) ---
+            const checkoutItemsContainer = document.getElementById('checkout-items-container');
+            const checkoutSubtotal = document.getElementById('checkout-subtotal');
+            const checkoutTotal = document.getElementById('checkout-total');
+            const submitOrderBtn = document.getElementById('submit-order-btn');
+            const termsCheckbox = document.getElementById('terms-checkbox');
+            const checkoutForm = document.getElementById('checkout-form');
+            const checkoutErrorMsg = document.getElementById('checkout-error-msg');
+
+            // --- FUNCIÓN DE NAVEGACIÓN ---
+            /**
+             * Cambia la vista activa.
+             */
+            function navigateTo(viewId) {
+                views.forEach(view => {
+                    view.classList.remove('active');
+                });
+                const targetView = document.getElementById(viewId);
+                if (targetView) {
+                    targetView.classList.add('active');
+                    appState.currentView = viewId;
+                    window.scrollTo(0, 0); // Subir al inicio
+                } else {
+                    console.error('Vista no encontrada:', viewId);
+                }
+            }
+
+            /**
+             * Carga los datos de un producto o categoría (simulado).
+             */
+            function loadViewData(targetView, element) {
+                if (targetView === 'view-product-detail') {
+                    const productId = element.dataset.productId;
+                    const productTitle = element.dataset.productTitle || 'Producto';
+                    appState.currentProduct = { id: productId, title: productTitle };
+                    
+                    // Actualizar la vista de detalle
+                    const title = document.getElementById('product-title');
+                    const image = document.getElementById('product-image');
+                    if(title) title.textContent = productTitle;
+                    // (Aquí podrías cambiar la imagen también)
+                }
+                
+                if (targetView === 'view-category') {
+                    const categoryId = element.dataset.categoryId || 'impresiones';
+                    const categoryTitle = element.textContent || 'Categoría';
+                    appState.currentCategory = categoryId; // Guardar la categoría actual
+
+                    // Actualizar la vista de categoría
+                    const title = document.getElementById('category-title');
+                    if(title) title.textContent = categoryTitle;
+                }
+                
+                // Si vamos a la vista de configuración, reseteamos el estado
+                if (targetView === 'view-config') {
+                    // Solo resetear si NO estamos editando
+                    if (!appState.editingItemId) {
+                        // Resetear la configuración actual
+                        appState.currentConfiguration = structuredClone(defaultConfig);
+                        
+                        // Resetear el formulario (UI)
+                        resetConfigForm();
+
+                        // Limpiar input de archivo
+                        if(fileInput) fileInput.value = null; 
+                        
+                        // Actualizar el resumen (para que muestre todo en 0)
+                        updateSummary(); 
+                        
+                        // Ir al paso 1
+                        navigateToStep(1);
+                    }
+                }
+            }
+            
+            // --- MANEJADORES DE EVENTOS (EVENT LISTENERS) ---
+
+            // 1. Links de navegación
+            appLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetView = e.currentTarget.dataset.targetView;
+                    if (targetView) {
+                        // Cargar datos ANTES de navegar
+                        loadViewData(targetView, e.currentTarget);
+                        // Navegar a la vista
+                        navigateTo(targetView);
+                    }
+                });
+            });
+            
+            // 2. Modal de Precios
+            if (showPriceModalBtn) {
+                showPriceModalBtn.addEventListener('click', () => {
+                    priceModal.classList.remove('hidden');
+                });
+            }
+            if (closePriceModalBtn) {
+                closePriceModalBtn.addEventListener('click', () => {
+                    priceModal.classList.add('hidden');
+                });
+            }
+            if (priceModal) {
+                priceModal.addEventListener('click', (e) => {
+                    if (e.target === priceModal) {
+                        priceModal.classList.add('hidden');
+                    }
+                });
+            }
+
+            // 3. Botón del Carrito
+            if (cartButton) {
+                cartButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    if (appState.cart.length === 0) {
+                        console.log("El carrito está vacío");
+                        return; 
+                    }
+                    
+                    console.log('Abriendo checkout...');
+                    renderCheckoutView();
+                    navigateTo('view-checkout');
+                });
+            }
+
+            // --- NUEVO: Listeners para el Modal de "Añadido al Carrito" ---
+            function showAddToCartModal() {
+                if(addToCartModal) addToCartModal.classList.remove('hidden');
+            }
+            function hideAddToCartModal() {
+                if(addToCartModal) addToCartModal.classList.add('hidden');
+            }
+            
+            if (modalGoToCartBtn) {
+                modalGoToCartBtn.addEventListener('click', () => {
+                    hideAddToCartModal();
+                    renderCheckoutView();
+                    navigateTo('view-checkout');
+                });
+            }
+            
+            if (modalAddAnotherBtn) {
+                modalAddAnotherBtn.addEventListener('click', () => {
+                    hideAddToCartModal();
+                    // Volver a la lista de categorías
+                    const lastCategory = appState.currentCategory || 'impresiones';
+                    loadViewData('view-category', { dataset: { categoryId: lastCategory }, textContent: lastCategory });
+                    navigateTo('view-category');
+                });
+            }
+
+            // --- INICIALIZACIÓN ---
+            navigateTo('view-home'); 
+            
+            
+            // --- LÓGICA DE CONFIGURACIÓN DE PRODUCTO ---
+            
+            // --- Estado de la configuración actual ---
+            const defaultConfig = {
+                id: null,
+                file: null,
+                fileName: 'Ningún archivo subido',
+                fileBase64: null,
+                fileType: null,
+                cantidad: 1,
+                pageCount: 1, // <--- NUEVO: Conteo de páginas
+                pagePrice: 0,
+                color: 'color',
+                paper: 'bond',
+                size: 'carta',
+                sides: 'una cara',
+                rango: '',
+                subtotal: 0,
+                total: 0
+            };
+            appState.currentConfiguration = structuredClone(defaultConfig);
+
+            // --- Elementos del DOM (Configuración) ---
+            const stepPanels = document.querySelectorAll('.step-panel');
+            const stepNavButtons = document.querySelectorAll('.step-nav-btn');
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+            const fileErrorMsg = document.getElementById('file-error-msg');
+            const visorFileName = document.getElementById('visor-file-name');
+            const visorNextBtn = document.getElementById('visor-next-btn');
+            const fileVisorIframe = document.getElementById('file-visor-iframe');
+            const visorPlaceholder = document.getElementById('visor-placeholder');
+
+            // --- NUEVO: Elementos del Visor PDF ---
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const pdfCanvas = document.getElementById('pdf-canvas');
+            const pdfPrevBtn = document.getElementById('pdf-prev');
+            const pdfNextBtn = document.getElementById('pdf-next');
+            const pdfPageNum = document.getElementById('pdf-page-num');
+            const pdfPageCount = document.getElementById('pdf-page-count');
+            // Estado global para el PDF
+            let pdfDoc = null;
+            let currentPageNum = 1;
+
+
+            // --- Elementos del Formulario (Paso 3) ---
+            const configCantidad = document.getElementById('config-cantidad');
+            const configColor = document.getElementById('config-color');
+            const configPaper = document.getElementById('config-paper');
+            const configSize = document.getElementById('config-size');
+            const configSides = document.getElementById('config-sides');
+            const configRango = document.getElementById('config-rango');
+            const configPages = document.getElementById('config-pages'); // <--- NUEVO
+            const configPagesWrapper = document.getElementById('config-pages-wrapper');
+            const configPagesHelp = document.getElementById('config-pages-help');
+            const configFormInputs = [configCantidad, configColor, configPaper, configSize, configSides, configRango, configPages];
+            
+            // --- Elementos del Resumen (Sidebar) ---
+            const summaryFileName = document.getElementById('summary-file-name');
+            const summaryCantidad = document.getElementById('summary-cantidad');
+            const summaryPagePrice = document.getElementById('summary-page-price');
+            const summaryColor = document.getElementById('summary-color');
+            const summaryPaper = document.getElementById('summary-paper');
+            const summarySize = document.getElementById('summary-size');
+            const summarySides = document.getElementById('summary-sides');
+            const summarySubtotal = document.getElementById('summary-subtotal');
+            const summarySectionTotal = document.getElementById('summary-section-total');
+            const summaryFinalTotal = document.getElementById('summary-final-total');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+
+            // --- Función para navegar entre pasos ---
+            function navigateToStep(stepNumber) {
+                stepPanels.forEach(panel => panel.classList.remove('active'));
+                stepNavButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.add('disabled');
+                });
+
+                const targetPanel = document.getElementById(`step-panel-${stepNumber}`);
+                const targetNav = document.getElementById(`step-nav-${stepNumber}`);
+                
+                if (targetPanel) targetPanel.classList.add('active');
+                if (targetNav) {
+                    targetNav.classList.add('active');
+                    targetNav.classList.remove('disabled');
+                }
+
+                for (let i = 1; i < stepNumber; i++) {
+                    const prevNav = document.getElementById(`step-nav-${i}`);
+                    if (prevNav) {
+                        prevNav.classList.remove('disabled');
+                    }
+                }
+            }
+            
+            // --- Resetear formulario de config ---
+            function resetConfigForm() {
+                if(!configFormInputs.length) return;
+                
+                configFormInputs.forEach(input => {
+                    const key = input.id.split('-')[1];
+                    if (defaultConfig.hasOwnProperty(key)) {
+                        input.value = defaultConfig[key];
+                    }
+                });
+                configCantidad.value = 1;
+                configColor.value = 'color';
+                configPaper.value = 'bond';
+                configSize.value = 'carta';
+                configSides.value = 'una cara';
+                configRango.value = '';
+                configPages.value = 1; // <--- NUEVO
+                configPagesWrapper.classList.add('hidden'); // <--- NUEVO
+
+                // Resetear botón y link de "volver"
+                addToCartBtn.textContent = 'Añadir al carrito';
+                const backLink = document.querySelector('#view-config .app-link');
+                if (backLink) {
+                    backLink.dataset.targetView = 'view-product-detail';
+                    backLink.innerHTML = '&larr; Volver a Detalle';
+                }
+            }
+
+            // --- Función para calcular precio (Simulada) ---
+            function calculatePrice() {
+                const config = appState.currentConfiguration;
+                let subtotal = 0;
+                let basePrice = (config.color === 'b/n') ? 1 : 3;
+                if (config.paper === 'opalina') basePrice += 4;
+                if (config.paper === 'couche') basePrice += 3;
+                let pageCount = config.pageCount; // <--- CAMBIO: Usar el pageCount del estado
+                subtotal = basePrice * pageCount * config.cantidad;
+                config.subtotal = subtotal;
+                config.total = subtotal;
+                config.pagePrice = basePrice;
+                updateSummary();
+            }
+
+            // --- Función para actualizar el Resumen (Sidebar) ---
+            function updateSummary() {
+                const config = appState.currentConfiguration;
+                
+                summaryFileName.textContent = config.fileName;
+                summaryCantidad.textContent = config.cantidad;
+                summaryPagePrice.textContent = `$ ${config.pagePrice.toFixed(2)}`;
+                summaryColor.textContent = document.querySelector(`#config-color option[value="${config.color}"]`)?.textContent || config.color;
+                summaryPaper.textContent = document.querySelector(`#config-paper option[value="${config.paper}"]`)?.textContent || config.paper;
+                summarySize.textContent = document.querySelector(`#config-size option[value="${config.size}"]`)?.textContent || config.size;
+                summarySides.textContent = document.querySelector(`#config-sides option[value="${config.sides}"]`)?.textContent || config.sides;
+                summarySubtotal.textContent = `$ ${config.subtotal.toFixed(2)}`;
+                summarySectionTotal.textContent = `$ ${config.total.toFixed(2)}`;
+                summaryFinalTotal.textContent = `$ ${config.total.toFixed(2)}`;
+                
+                if ((config.file || appState.editingItemId) && config.cantidad > 0) {
+                    addToCartBtn.disabled = false;
+                } else {
+                    addToCartBtn.disabled = true;
+                }
+            }
+            
+            // --- Función para manejar la selección de archivo ---
+            function handleFileSelect(file) {
+                if (!file) return;
+
+                if (file.size > 100 * 1024 * 1024) { // 100MB
+                    fileErrorMsg.textContent = "El archivo es demasiado grande (máx 100MB).";
+                    fileErrorMsg.classList.remove('hidden');
+                    return;
+                }
+                fileErrorMsg.classList.add('hidden');
+
+                appState.currentConfiguration.file = file;
+                appState.currentConfiguration.fileName = file.name;
+                appState.currentConfiguration.fileType = file.type;
+
+                calculatePrice();
+                navigateToStep(2);
+                visorFileName.textContent = file.name;
+
+                // Resetear visores
+                fileVisorIframe.classList.add('hidden');
+                fileVisorIframe.src = '';
+                pdfViewer.classList.add('hidden');
+                visorPlaceholder.classList.add('hidden');
+                pdfDoc = null;
+                currentPageNum = 1;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileData = e.target.result;
+                    appState.currentConfiguration.fileBase64 = fileData.split(',')[1];
+                    
+                    if (file.type.startsWith('image/')) {
+                        fileVisorIframe.src = fileData;
+                        fileVisorIframe.classList.remove('hidden');
+                        visorPlaceholder.classList.add('hidden');
+                        
+                        // Es una imagen, 1 página
+                        appState.currentConfiguration.pageCount = 1;
+                        configPages.value = 1;
+                        configPages.disabled = true;
+                        configPagesWrapper.classList.remove('hidden');
+                        configPagesHelp.textContent = "Las imágenes cuentan como 1 página.";
+
+                    } else if (file.type === 'application/pdf') {
+                        // --- NUEVA LÓGICA PARA PDF ---
+                        pdfViewer.classList.remove('hidden');
+                        visorPlaceholder.classList.add('hidden');
+                        configPagesWrapper.classList.add('hidden'); // Ocultar, lo detectamos auto
+                        
+                        // Convertir DataURL a ArrayBuffer para PDF.js
+                        const pdfData = atob(fileData.split(',')[1]);
+                        loadPdfViewer(pdfData);
+
+                    } else {
+                        // --- LÓGICA PARA OTROS (WORD, PPT, ETC.) ---
+                        fileVisorIframe.classList.add('hidden');
+                        visorPlaceholder.classList.remove('hidden');
+                        
+                        // Pedir al usuario el número de páginas
+                        appState.currentConfiguration.pageCount = 1;
+                        configPages.value = 1;
+                        configPages.disabled = false;
+                        configPagesWrapper.classList.remove('hidden');
+                        configPagesHelp.textContent = "Por favor, confirma el total de páginas de tu documento.";
+                    }
+                };
+                reader.onerror = (error) => {
+                    console.error("Error al leer el archivo:", error);
+                    fileErrorMsg.textContent = "Error al leer el archivo.";
+                    fileErrorMsg.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // --- NUEVA FUNCIÓN: Cargar Visor PDF ---
+            async function loadPdfViewer(pdfData) {
+                try {
+                    pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                    
+                    const numPages = pdfDoc.numPages;
+                    pdfPageCount.textContent = numPages;
+                    
+                    // Actualizar estado y formulario
+                    appState.currentConfiguration.pageCount = numPages;
+                    configPages.value = numPages;
+                    configPages.disabled = true; // Deshabilitar, ya que lo detectamos
+                    configPagesWrapper.classList.remove('hidden');
+                    configPagesHelp.textContent = "Páginas detectadas automáticamente de tu PDF.";
+                    
+                    calculatePrice(); // Recalcular precio con las páginas correctas
+                    
+                    // Renderizar la primera página
+                    currentPageNum = 1;
+                    renderPdfPage(currentPageNum);
+                    
+                } catch (err) {
+                    console.error("Error al cargar PDF:", err);
+                    visorPlaceholder.textContent = "Error al cargar el visor de PDF.";
+                    visorPlaceholder.classList.remove('hidden');
+                    pdfViewer.classList.add('hidden');
+                }
+            }
+
+            // --- NUEVA FUNCIÓN: Renderizar Página PDF ---
+            async function renderPdfPage(pageNum) {
+                if (!pdfDoc) return;
+                
+                pageNum = Math.max(1, Math.min(pdfDoc.numPages, pageNum));
+                
+                const page = await pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 1.5 });
+                
+                const context = pdfCanvas.getContext('2d');
+                pdfCanvas.height = viewport.height;
+                pdfCanvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                await page.render(renderContext).promise;
+                
+                currentPageNum = pageNum;
+                pdfPageNum.textContent = pageNum;
+                
+                // Actualizar botones
+                pdfPrevBtn.disabled = (pageNum <= 1);
+                pdfNextBtn.disabled = (pageNum >= pdfDoc.numPages);
+            }
+            
+            // --- NUEVOS LISTENERS: Botones PDF ---
+            if (pdfPrevBtn) {
+                pdfPrevBtn.addEventListener('click', () => {
+                    if (currentPageNum <= 1) return;
+                    renderPdfPage(currentPageNum - 1);
+                });
+            }
+            if (pdfNextBtn) {
+                pdfNextBtn.addEventListener('click', () => {
+                    if (currentPageNum >= pdfDoc.numPages) return;
+                    renderPdfPage(currentPageNum + 1);
+                });
+            }
+
+
+            // --- Event Listeners (Configuración) ---
+
+            stepNavButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const step = e.currentTarget.id.split('-')[2];
+                    if (!e.currentTarget.classList.contains('disabled')) {
+                        navigateToStep(parseInt(step, 10));
+                    }
+                });
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFileSelect(e.target.files[0]);
+            });
+
+            if (dropZone) {
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                });
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    handleFileSelect(e.dataTransfer.files[0]);
+                });
+            }
+            
+            if (visorNextBtn) {
+                visorNextBtn.addEventListener('click', () => {
+                    navigateToStep(3);
+                });
+            }
+
+            // Event listener para el nuevo input de páginas
+            if (configPages) {
+                configPages.addEventListener('change', (e) => {
+                    let value = parseFloat(e.target.value) < 1 ? 1 : parseFloat(e.target.value);
+                    e.target.value = value;
+                    appState.currentConfiguration.pageCount = value;
+                    calculatePrice();
+                });
+            }
+
+
+            configFormInputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const configKey = e.target.id.split('-')[1];
+                    let value = e.target.value;
+                    if (e.target.type === 'number') {
+                        value = parseFloat(e.target.value) < 1 ? 1 : parseFloat(e.target.value);
+                        e.target.value = value;
+                    }
+                    
+                    // No sobreescribir el pageCount si el input que cambió no es ese
+                    if (configKey !== 'pages') { 
+                        appState.currentConfiguration[configKey] = value;
+                    }
+                    calculatePrice();
+                });
+            });
+
+            // 6. Botón "Añadir al carrito" (CON LÓGICA DE EDICIÓN Y MODAL)
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', () => {
+                    if (addToCartBtn.disabled) return;
+                    
+                    if (appState.editingItemId) {
+                        // --- LÓGICA DE EDICIÓN ---
+                        const index = appState.cart.findIndex(item => item.id === appState.editingItemId);
+                        if (index !== -1) {
+                            const oldItem = appState.cart[index];
+                            appState.cart[index] = {
+                                ...oldItem,
+                                ...appState.currentConfiguration,
+                                id: oldItem.id
+                            };
+                        }
+                        
+                        appState.editingItemId = null;
+                        appState.currentConfiguration = structuredClone(defaultConfig);
+                        resetConfigForm();
+                        if (fileInput) fileInput.value = null;
+                        updateSummary();
+                        
+                        renderCheckoutView();
+                        navigateTo('view-checkout');
+
+                    } else {
+                        // --- LÓGICA DE AÑADIR NUEVO ---
+                        const cartItemId = `cartItem-${Date.now()}`;
+                        appState.currentConfiguration.id = cartItemId;
+                        appState.cart.push(structuredClone(appState.currentConfiguration));
+                        
+                        cartCountEl.textContent = appState.cart.length;
+                        if (appState.cart.length > 0) {
+                            cartCountEl.classList.remove('hidden');
+                        } else {
+                            cartCountEl.classList.add('hidden');
+                        }
+                        
+                        appState.currentConfiguration = structuredClone(defaultConfig);
+                        resetConfigForm();
+                        fileInput.value = null;
+                        updateSummary();
+                        
+                        if (checkoutForm) checkoutForm.reset();
+                        if (termsCheckbox) termsCheckbox.checked = false;
+                        if (submitOrderBtn) submitOrderBtn.disabled = true;
+
+                        // --- CAMBIO: Mostrar Modal en lugar de navegar ---
+                        showAddToCartModal();
+                        // ---------------------------------------------
+                    }
+                });
+            }
+            
+            
+            // --- LÓGICA DE CHECKOUT ---
+
+            function renderCheckoutView() {
+                if (!checkoutItemsContainer) return;
+
+                checkoutItemsContainer.innerHTML = '';
+                let subtotal = 0;
+                let total = 0;
+                
+                if (appState.cart.length === 0) {
+                    checkoutItemsContainer.innerHTML = '<p class="text-gray-600">Tu carrito está vacío.</p>';
+                    checkoutSubtotal.textContent = '$ 0.00';
+                    checkoutTotal.textContent = '$ 0.00';
+                    return;
+                }
+
+                appState.cart.forEach(item => {
+                    subtotal += item.total;
+                    const colorText = document.querySelector(`#config-color option[value="${item.color}"]`)?.textContent || item.color;
+                    const paperText = document.querySelector(`#config-paper option[value="${item.paper}"]`)?.textContent || item.paper;
+                    const sizeText = document.querySelector(`#config-size option[value="${item.size}"]`)?.textContent || item.size;
+
+                    const itemHTML = `
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex justify-between items-start">
+                            <div class="flex-grow">
+                                <h3 class="font-semibold text-lg text-gray-900">${item.fileName}</h3>
+                                <p class="text-sm text-gray-600">
+                                    ${item.cantidad} juego(s) &bull; ${item.pageCount} pág(s) c/u &bull; ${colorText} &bull; ${paperText} &bull; ${sizeText}
+                                </p>
+                                <p class="text-lg font-bold text-blue-700 mt-2">$ ${item.total.toFixed(2)}</p>
+                            </div>
+                            <div class="ml-4 flex-shrink-0">
+                                <button class="remove-cart-item-btn text-red-500 hover:text-red-700 font-medium text-sm" data-item-id="${item.id}">
+                                    Eliminar
+                                </button>
+                                <button class="edit-cart-item-btn text-blue-500 hover:text-blue-700 font-medium text-sm ml-2" data-item-id="${item.id}">
+                                    Editar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    checkoutItemsContainer.insertAdjacentHTML('beforeend', itemHTML);
+                });
+
+                total = subtotal;
+                checkoutSubtotal.textContent = `$ ${subtotal.toFixed(2)}`;
+                checkoutTotal.textContent = `$ ${total.toFixed(2)}`;
+                
+                addCheckoutEventListeners();
+            }
+
+            function addCheckoutEventListeners() {
+                document.querySelectorAll('.remove-cart-item-btn, .edit-cart-item-btn').forEach(btn => {
+                    btn.replaceWith(btn.cloneNode(true));
+                });
+                
+                document.querySelectorAll('.remove-cart-item-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const itemId = e.currentTarget.dataset.itemId;
+                        appState.cart = appState.cart.filter(item => item.id !== itemId);
+                        
+                        cartCountEl.textContent = appState.cart.length;
+                        if (appState.cart.length === 0) {
+                            cartCountEl.classList.add('hidden');
+                            navigateTo('view-home');
+                        }
+                        
+                        renderCheckoutView();
+                    });
+                });
+
+                document.querySelectorAll('.edit-cart-item-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const itemId = e.currentTarget.dataset.itemId;
+                        loadItemForEditing(itemId);
+                    });
+                });
+            }
+
+            /**
+             * Carga los datos de un item del carrito en la vista de configuración.
+             */
+            function loadItemForEditing(itemId) {
+                const itemToEdit = appState.cart.find(item => item.id === itemId);
+                if (!itemToEdit) {
+                    console.error("No se encontró el item a editar:", itemId);
+                    return;
+                }
+
+                // 1. Marcar que estamos editando
+                appState.editingItemId = itemId;
+                
+                // 2. Cargar la configuración del item en el estado
+                appState.currentConfiguration = structuredClone(itemToEdit);
+
+                // 3. Poblar el formulario de configuración (Paso 3)
+                configCantidad.value = itemToEdit.cantidad;
+                configColor.value = itemToEdit.color;
+                configPaper.value = itemToEdit.paper;
+                configSize.value = itemToEdit.size;
+                configSides.value = itemToEdit.sides;
+                configRango.value = itemToEdit.rango;
+                configPages.value = itemToEdit.pageCount; // <--- NUEVO
+                
+                // 4. Actualizar el resumen (sidebar)
+                updateSummary();
+                
+                // 5. Ajustar la UI de 'view-config'
+                addToCartBtn.textContent = 'Actualizar Pedido';
+                const backLink = document.querySelector('#view-config .app-link');
+                if (backLink) {
+                    backLink.dataset.targetView = 'view-checkout'; // Regresar al checkout
+                    backLink.innerHTML = '&larr; Volver al Carrito';
+                }
+
+                // 6. Navegar a la vista de configuración
+                navigateTo('view-config');
+                
+                // 7. --- CORRECCIÓN CLAVE ---
+                // Navegar directamente al panel 3 (Configuración)
+                // Y simular la carga del archivo para que el resumen se vea bien
+                
+                // Simular carga de archivo (para el resumen y estado del visor)
+                visorPlaceholder.classList.remove('hidden');
+                fileVisorIframe.classList.add('hidden');
+                pdfViewer.classList.add('hidden');
+                
+                if (itemToEdit.fileType === 'application/pdf') {
+                    // Si es PDF, cargamos el visor (costoso pero correcto)
+                    pdfViewer.classList.remove('hidden');
+                    visorPlaceholder.classList.add('hidden');
+                    const pdfData = atob(itemToEdit.fileBase64);
+                    loadPdfViewer(pdfData);
+                    configPagesWrapper.classList.add('hidden');
+
+                } else if (itemToEdit.fileType.startsWith('image/')) {
+                    // Si es imagen, mostramos el iframe
+                    fileVisorIframe.src = `data:${itemToEdit.fileType};base64,${itemToEdit.fileBase64}`;
+                    fileVisorIframe.classList.remove('hidden');
+                    visorPlaceholder.classList.add('hidden');
+                    configPages.disabled = true;
+                    configPagesWrapper.classList.remove('hidden');
+                    configPagesHelp.textContent = "Las imágenes cuentan como 1 página.";
+
+                } else {
+                    // Si es Word/otro, mostramos placeholder y pedimos páginas
+                    visorPlaceholder.classList.remove('hidden');
+                    configPages.disabled = false;
+                    configPagesWrapper.classList.remove('hidden');
+                    configPagesHelp.textContent = "Por favor, confirma el total de páginas de tu documento.";
+                }
+
+                
+                console.log("Navegando a edición, Step 3");
+                navigateToStep(3);
+            }
+
+
+            if (termsCheckbox) {
+                termsCheckbox.addEventListener('change', () => {
+                    if (termsCheckbox.checked) {
+                        submitOrderBtn.disabled = false;
+                    } else {
+                        submitOrderBtn.disabled = true;
+                    }
+                });
+            }
+
+            if (submitOrderBtn) {
+                submitOrderBtn.addEventListener('click', handleSendOrder);
+            }
+
+            async function handleSendOrder(e) {
+                e.preventDefault();
+                if (!checkoutForm.checkValidity()) {
+                    checkoutErrorMsg.textContent = 'Por favor, completa todos los campos de entrega.';
+                    checkoutErrorMsg.classList.remove('hidden');
+                    return;
+                }
+                checkoutErrorMsg.classList.add('hidden');
+
+                submitOrderBtn.disabled = true;
+                submitOrderBtn.textContent = 'Procesando Pedido...';
+                
+                console.log("Enviando pedido real a Google Apps Script...");
+
+                const datosCliente = {
+                    nombre: document.getElementById('checkout-nombre').value,
+                    telefono: document.getElementById('checkout-telefono').value,
+                    sucursal: document.getElementById('checkout-sucursal').value,
+                    metodoEntrega: document.getElementById('checkout-metodo').value,
+                    total: parseFloat(checkoutTotal.textContent.replace('$', ''))
+                };
+                
+                const items = appState.cart;
+                
+                const payload = {
+                    cliente: datosCliente,
+                    items: items
+                };
+
+                console.log("Payload a enviar:", payload);
+                
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'cors', 
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        redirect: 'follow',
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const resultText = await response.text();
+                    
+                    if (!resultText) {
+                         throw new Error("Respuesta vacía del servidor. Revisa los permisos (CORS) y la implementación de 'doPost'.");
+                    }
+                    
+                    const result = JSON.parse(resultText);
+
+                    if (result.status === "success" && result.folio) {
+                        document.getElementById('folio-number').textContent = result.folio;
+                        appState.cart = [];
+                        cartCountEl.textContent = 0;
+                        cartCountEl.classList.add('hidden');
+                        checkoutForm.reset();
+                        termsCheckbox.checked = false;
+                        submitOrderBtn.textContent = 'Pagar y Enviar Pedido';
+                        navigateTo('view-thanks');
+                    } else {
+                        throw new Error(result.message || 'Error desconocido del servidor de Google.');
+                    }
+
+                } catch (error) {
+                    console.error("Error al enviar el pedido:", error);
+                    checkoutErrorMsg.textContent = `Error: ${error.message}. Revisa la consola (F12) para más detalles.`;
+                    checkoutErrorMsg.classList.remove('hidden');
+                    submitOrderBtn.disabled = false;
+                    submitOrderBtn.textContent = 'Pagar y Enviar Pedido';
+                }
+            }
+
+        }); // Fin de DOMContentLoaded
+    </script>
