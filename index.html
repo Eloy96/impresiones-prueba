@@ -3,163 +3,659 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servicio de Impresiones Lumen</title>
-    <!-- Enlace al archivo CSS que subirás por separado -->
-    <link rel="stylesheet" href="style.css"> 
+    <title>Impresión Lumen - Servicio de Impresión Online</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Contenedor Principal -->
+    <div class="container mx-auto px-4 py-6 md:px-8 md:py-8 max-w-7xl">
+        
+        <!-- Header -->
+        <header class="bg-white rounded-lg shadow-lg p-3 md:p-4 flex justify-between items-center mb-6 md:sticky top-4 z-50">
+            <h1 class="text-xl md:text-2xl font-bold text-blue-700">
+                <a class="app-link" data-target-view="view-home" href="#">Impresión Lumen</a>
+            </h1>
+            <button class="relative text-gray-700 hover:text-blue-700 transition-colors p-1" id="cart-button">
+                <svg class="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                <span class="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden" id="cart-count">0</span>
+            </button>
+        </header>
 
-    <header>
-        <h1 class="main-header-title">
-            <button class="nav-link-btn" onclick="navigate('home')">Inicio</button> 
-            <span class="colorful-lumen">Lumen</span>
-        </h1>
-        <nav>
-            <button onclick="navigate('product-config')">Imprimir Ahora</button>
-            <button onclick="navigate('cart')">🛒 Carrito (<span id="cart-count">0</span>)</button>
-        </nav>
-    </header>
-
-    <main id="app-container">
-        <!-- SECCIÓN 1: HOME -->
-        <section id="home-view" class="view active">
-            <!-- BANNER PRINCIPAL (Excluido de fade-in) -->
-            <div class="banner-container">
-                <img src="URL_DE_IMAGEN_BANNER_1200x360" alt="Banner de promociones o novedades" class="main-banner">
-                <div class="banner-overlay">
-                    <h2>¡Tus Impresiones, a un Clic de Distancia!</h2>
-                    <p>Rápido, fácil y con la calidad que esperas de Lumen.</p>
-                </div>
-            </div>
-
-            <h2 class="section-title">Nuestros Servicios Destacados</h2>
-            
-            <!-- CAPAS DE PRODUCTOS (4 por renglón) - CON EFECTO FADE-IN -->
-            <div class="product-grid">
-                
-                <!-- Ítem 1 -->
-                <div class="product-item" onclick="navigate('product-config')">
-                    <img data-src="URL_DE_IMAGEN_REFERENCIAL_250x250_1" alt="Impresión Láser Color" class="item-img">
-                    <h3>Impresión a Color</h3>
-                    <p>Ideal para presentaciones y documentos con gráficos vibrantes.</p>
-                    <button class="small-btn">Configurar Pedido &rarr;</button>
-                </div>
-
-                <!-- Ítem 2 -->
-                <div class="product-item" onclick="navigate('product-config')">
-                    <img data-src="URL_DE_IMAGEN_REFERENCIAL_250x250_2" alt="Impresión Blanco y Negro" class="item-img">
-                    <h3>Copia B/N Económica</h3>
-                    <p>Máxima calidad para documentos y textos a precios inigualables.</p>
-                    <button class="small-btn">Configurar Pedido &rarr;</button>
-                </div>
-
-                <!-- Ítem 3 -->
-                <div class="product-item" onclick="navigate('product-config')">
-                    <img data-src="URL_DE_IMAGEN_REFERENCIAL_250x250_3" alt="Impresión en Gran Formato" class="item-img">
-                    <h3>Gran Formato (Plotter)</h3>
-                    <p>Impresiones de planos, pósters y material promocional grande.</p>
-                    <button class="small-btn">Configurar Pedido &rarr;</button>
-                </div>
-                
-                <!-- Ítem 4 -->
-                <div class="product-item" onclick="navigate('product-config')">
-                    <img data-src="URL_DE_IMAGEN_REFERENCIAL_250x250_4" alt="Personalización y Acabados" class="item-img">
-                    <h3>Acabados Profesionales</h3>
-                    <p>Encuadernación, laminado y cortes para un resultado de impacto.</p>
-                    <button class="small-btn">Configurar Pedido &rarr;</button>
-                </div>
-
-            </div>
-
-            <h2 class="section-title">Productos Relacionados (Carrusel)</h2>
-            
-            <!-- CARRUSEL DE PRODUCTOS (Miniaturas/Cuadrados) -->
-            <div class="carousel-container">
-                <button class="carousel-btn prev-btn">&lt;</button>
-                <div class="carousel-track">
-                    <div id="product-carousel" class="carousel-wrapper">
-                        
-                        <!-- Ítem Carrusel 1 -->
-                        <div class="carousel-item" onclick="navigate('product-config')">
-                            <div class="carousel-thumbnail">
-                                <img src="URL_DE_IMAGEN_CARRUSEL_1" alt="Miniatura 1">
-                            </div>
-                            <p class="carousel-caption">Papel Couche</p>
-                        </div>
-                        
-                        <!-- Ítem Carrusel 2 -->
-                        <div class="carousel-item" onclick="navigate('product-config')">
-                            <div class="carousel-thumbnail circle">
-                                <img src="URL_DE_IMAGEN_CARRUSEL_2" alt="Miniatura 2">
-                            </div>
-                            <p class="carousel-caption">Opalina</p>
-                        </div>
-
-                        <!-- Ítem Carrusel 3 -->
-                        <div class="carousel-item" onclick="navigate('product-config')">
-                            <div class="carousel-thumbnail">
-                                <img src="URL_DE_IMAGEN_CARRUSEL_3" alt="Miniatura 3">
-                            </div>
-                            <p class="carousel-caption">Etiquetas</p>
-                        </div>
-
-                        <!-- Ítem Carrusel 4 -->
-                        <div class="carousel-item" onclick="navigate('product-config')">
-                            <div class="carousel-thumbnail circle">
-                                <img src="URL_DE_IMAGEN_CARRUSEL_4" alt="Miniatura 4">
-                            </div>
-                            <p class="carousel-caption">Terminado</p>
-                        </div>
-                        
-                        <!-- Ítem Carrusel 5 (Ejemplo para probar el carrusel) -->
-                        <div class="carousel-item" onclick="navigate('product-config')">
-                            <div class="carousel-thumbnail">
-                                <img src="URL_DE_IMAGEN_CARRUSEL_5" alt="Miniatura 5">
-                            </div>
-                            <p class="carousel-caption">Bond</p>
-                        </div>
-
+        <!-- Vista Home -->
+        <section class="app-view active" id="view-home">
+            <!-- Banner Principal -->
+            <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-xl overflow-hidden mb-8 h-48 md:h-64 lg:h-80 fade-in-simple">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center">
+                        <h2 class="text-2xl md:text-4xl font-bold mb-4">Tu Servicio de Impresión Online</h2>
+                        <p class="text-lg md:text-xl opacity-90">Rápido, confiable y de calidad</p>
                     </div>
                 </div>
-                <button class="carousel-btn next-btn">&gt;</button>
             </div>
 
-            <!-- TEXTO SEO -->
-            <div class="seo-text">
-                <h3>Servicio de Impresión Profesional en Lumen</h3>
-                <p>En Lumen, ofrecemos soluciones de impresión de alta calidad para estudiantes, profesionales y empresas. Desde impresiones láser a color y blanco y negro hasta proyectos de gran formato, garantizamos rapidez y precios competitivos. Configura tu pedido en línea de forma sencilla, sube tus documentos directamente a Drive y elige la sucursal más cercana o el envío a domicilio. Tu impresión perfecta está a solo unos clics.</p>
+            <!-- Menú de Servicios -->
+            <nav class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-8 fade-in-up">
+                <h2 class="text-lg md:text-xl font-semibold mb-4 text-gray-800">Nuestros Servicios</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+                    
+                    <!-- Servicio 1: Impresión B/N -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="impresion_bn" 
+                       data-category-title="Impresión Blanco y Negro" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-gray-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">B/N</span>
+                        </div>
+                        <span class="text-sm md:text-base">Impr. B/N</span>
+                    </a>
+
+                    <!-- Servicio 2: Impresión Color -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="impresion_color" 
+                       data-category-title="Impresión Color" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-red-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">COLOR</span>
+                        </div>
+                        <span class="text-sm md:text-base">Impr. Color</span>
+                    </a>
+
+                    <!-- Servicio 3: Planos -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="planos" 
+                       data-category-title="Impresión Planos" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-cyan-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">PLANOS</span>
+                        </div>
+                        <span class="text-sm md:text-base">Planos</span>
+                    </a>
+
+                    <!-- Servicio 4: Ploteo -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="ploteo" 
+                       data-category-title="Ploteo Color" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-yellow-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">PLOTEO</span>
+                        </div>
+                        <span class="text-sm md:text-base">Ploteo</span>
+                    </a>
+
+                    <!-- Servicio 5: Texturizados -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="texturizados" 
+                       data-category-title="Papeles Texturizados" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-pink-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">PAPEL</span>
+                        </div>
+                        <span class="text-sm md:text-base">Texturizados</span>
+                    </a>
+
+                    <!-- Servicio 6: PVC -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="pvc" 
+                       data-category-title="Tarjetas PVC" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-purple-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">PVC</span>
+                        </div>
+                        <span class="text-sm md:text-base">Tarjetas PVC</span>
+                    </a>
+
+                    <!-- Servicio 7: Copias -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="copias" 
+                       data-category-title="Copias" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-gray-400 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">COPIA</span>
+                        </div>
+                        <span class="text-sm md:text-base">Copias</span>
+                    </a>
+
+                    <!-- Servicio 8: Otros -->
+                    <a class="app-link category-link p-3 md:p-4 bg-gray-50 rounded-lg font-medium text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300" 
+                       data-category-id="otros" 
+                       data-category-title="Otros Servicios" 
+                       data-target-view="view-category" href="#">
+                        <div class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-2 bg-green-300 rounded-md flex items-center justify-center">
+                            <span class="text-xs font-bold">MÁS</span>
+                        </div>
+                        <span class="text-sm md:text-base">Otros</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Carrusel Lo Más Solicitado -->
+            <div class="fade-in-up" style="animation-delay: 0.2s;">
+                <h2 class="text-xl md:text-2xl font-semibold mb-5 md:mb-6 text-gray-800">Lo Más Solicitado</h2>
+                <div class="horizontal-scroll-container flex overflow-x-auto gap-4 md:gap-6 pb-4 -mx-4 px-4">
+                    
+                    <!-- Item 1: Impresión B/N -->
+                    <a class="app-link carousel-item flex-shrink-0 w-36 md:w-40 text-center group block bg-white rounded-lg shadow-md p-3 overflow-hidden transition-transform duration-300 hover:scale-105" 
+                       data-product-id="prod-bn-carta" 
+                       data-product-title="Impresión B/N Carta" 
+                       data-target-view="view-product-detail" href="#">
+                        <div class="rounded-full w-24 h-24 md:w-28 md:h-28 mx-auto mb-2 overflow-hidden border-2 border-gray-200 bg-gray-300 flex items-center justify-center">
+                            <span class="text-sm font-bold">B/N</span>
+                        </div>
+                        <h3 class="font-medium text-sm md:text-base text-gray-700 group-hover:text-blue-700 truncate">Impresión B/N</h3>
+                        <p class="text-xs md:text-sm text-gray-500">Desde $1.30</p>
+                    </a>
+
+                    <!-- Item 2: Impresión Color -->
+                    <a class="app-link carousel-item flex-shrink-0 w-36 md:w-40 text-center group block bg-white rounded-lg shadow-md p-3 overflow-hidden transition-transform duration-300 hover:scale-105" 
+                       data-product-id="prod-color-laser" 
+                       data-product-title="Impresión Color Láser" 
+                       data-target-view="view-product-detail" href="#">
+                        <div class="rounded-full w-24 h-24 md:w-28 md:h-28 mx-auto mb-2 overflow-hidden border-2 border-gray-200 bg-red-300 flex items-center justify-center">
+                            <span class="text-sm font-bold">COLOR</span>
+                        </div>
+                        <h3 class="font-medium text-sm md:text-base text-gray-700 group-hover:text-blue-700 truncate">Impresión Color</h3>
+                        <p class="text-xs md:text-sm text-gray-500">Desde $15.00</p>
+                    </a>
+
+                    <!-- Item 3: Planos -->
+                    <a class="app-link carousel-item flex-shrink-0 w-36 md:w-40 text-center group block bg-white rounded-lg shadow-md p-3 overflow-hidden transition-transform duration-300 hover:scale-105" 
+                       data-product-id="prod-planos-bn" 
+                       data-product-title="Impresión Planos B/N" 
+                       data-target-view="view-product-detail" href="#">
+                        <div class="rounded-full w-24 h-24 md:w-28 md:h-28 mx-auto mb-2 overflow-hidden border-2 border-gray-200 bg-cyan-300 flex items-center justify-center">
+                            <span class="text-sm font-bold">PLANOS</span>
+                        </div>
+                        <h3 class="font-medium text-sm md:text-base text-gray-700 group-hover:text-blue-700 truncate">Planos</h3>
+                        <p class="text-xs md:text-sm text-gray-500">Desde $0.50</p>
+                    </a>
+
+                    <!-- Más items... -->
+                </div>
             </div>
 
+            <!-- Footer -->
+            <footer class="text-center mt-10 md:mt-12 py-6 border-t border-gray-300 fade-in-up" style="animation-delay: 0.3s;">
+                <a class="app-link text-xs md:text-sm text-gray-600 hover:underline mx-2" data-target-view="view-terms" href="#">Términos y Condiciones</a>
+                <span class="text-gray-400 mx-1">|</span>
+                <a class="app-link text-xs md:text-sm text-gray-600 hover:underline mx-2" data-target-view="view-privacy" href="#">Aviso de Privacidad</a>
+            </footer>
         </section>
 
-        <!-- SECCIÓN 2: CONFIGURACIÓN DEL PRODUCTO Y CARGA (Sigue igual) -->
-        <section id="product-config-view" class="view hidden">
-            <!-- Contenido de configuración de producto... -->
+        <!-- Vista Categoría -->
+        <section class="app-view" id="view-category">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block" data-target-view="view-home" href="#">← Volver al inicio</a>
+            <h1 class="text-2xl md:text-3xl font-bold mb-6" id="category-title">Categoría</h1>
+            <p class="mb-6 text-gray-600">Explora los servicios disponibles en esta categoría.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" id="category-items-container">
+                <!-- Contenido dinámico -->
+            </div>
         </section>
 
-        <!-- SECCIÓN 3: CARRITO DE COMPRAS (Sigue igual) -->
-        <section id="cart-view" class="view hidden">
-            <!-- Contenido del carrito... -->
+        <!-- Vista Detalle Producto -->
+        <section class="app-view" id="view-product-detail">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block text-sm" data-target-view="view-category" href="#" id="back-to-category-link">← Volver a Categorías</a>
+            <div class="bg-white rounded-lg shadow-xl p-4 md:p-8 overflow-hidden">
+                <div class="md:flex md:gap-6 lg:gap-8">
+                    <div class="md:w-1/2 mb-6 md:mb-0">
+                        <div class="w-full h-auto rounded-lg shadow-md bg-gray-100 flex items-center justify-center" style="min-height: 300px;">
+                            <span class="text-gray-500" id="product-image-placeholder">Imagen del Producto</span>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2">
+                        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4" id="product-title">Cargando...</h1>
+                        <p class="text-gray-600 text-base md:text-lg mb-4 md:mb-6">
+                            Entrega: <span class="font-semibold text-blue-700">Recolección en Sucursal</span>
+                        </p>
+                        <p class="mb-5 md:mb-6 text-sm md:text-base text-gray-700" id="product-description">Cargando descripción...</p>
+                        <div class="flex flex-col gap-3 md:gap-4">
+                            <button class="w-full bg-white border-2 border-blue-600 text-blue-600 font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-50 transition-colors text-sm md:text-base" id="show-price-modal-btn">
+                                Consultar Precios
+                            </button>
+                            <a class="app-link w-full text-center bg-blue-600 text-white font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-700 transition-colors text-sm md:text-base" data-target-view="view-config" href="#">
+                                Configurar Pedido
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- SECCIÓN 4: DATOS DEL CLIENTE (Sigue igual) -->
-        <section id="client-info-view" class="view hidden">
-            <!-- Contenido de datos del cliente... -->
+        <!-- Vista Configuración -->
+        <section class="app-view" id="view-config">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block text-sm" data-target-view="view-product-detail" href="#" id="back-to-detail-link">← Volver a Detalle</a>
+            
+            <div class="flex flex-col md:flex-row-reverse md:gap-6 lg:gap-8">
+                <!-- Sidebar Resumen -->
+                <aside class="w-full md:w-1/3 lg:w-1/4 mb-6 md:mb-0">
+                    <div class="bg-white rounded-lg shadow-lg p-4 md:sticky md:top-24">
+                        <h2 class="text-lg md:text-xl font-bold border-b border-gray-300 pb-3 mb-3">Resumen</h2>
+                        
+                        <!-- Resumen Archivo -->
+                        <div class="summary-section py-3">
+                            <h3 class="font-semibold text-sm text-gray-800 uppercase tracking-wide">Archivo</h3>
+                            <div class="text-xs md:text-sm text-gray-600 mt-1">
+                                <p class="truncate" id="summary-file-name" title="Ningún archivo subido">Ningún archivo subido</p>
+                            </div>
+                        </div>
+
+                        <!-- Resumen Impresión -->
+                        <div class="summary-section py-3">
+                            <h3 class="font-semibold text-sm text-gray-800 uppercase tracking-wide">Impresión</h3>
+                            <div class="text-xs md:text-sm text-gray-600 mt-2 space-y-1">
+                                <p>Copias: <span class="font-medium text-gray-900" id="summary-cantidad">1</span></p>
+                                <p>Precio/pág.: <span class="font-medium text-gray-900" id="summary-page-price">$ 0.00</span></p>
+                                <p>Color: <span class="font-medium text-gray-900" id="summary-color">Color</span></p>
+                                <p>Papel: <span class="font-medium text-gray-900" id="summary-paper">Papel Bond</span></p>
+                                <p>Tamaño: <span class="font-medium text-gray-900" id="summary-size">Carta</span></p>
+                                <p>Caras: <span class="font-medium text-gray-900" id="summary-sides">Una cara</span></p>
+                                <p>Págs. Imprimir: <span class="font-medium text-gray-900" id="summary-pages-to-print">Todo</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Resumen Precio -->
+                        <div class="summary-section py-3">
+                            <h3 class="font-semibold text-sm text-gray-800 uppercase tracking-wide">Precio por Copia</h3>
+                            <div class="text-xs md:text-sm text-gray-600 mt-2 space-y-1">
+                                <div class="flex justify-between">
+                                    <span>Subtotal:</span>
+                                    <span class="font-medium text-gray-900" id="summary-subtotal">$ 0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center py-4 text-base md:text-lg lg:text-xl font-bold">
+                            <span>TOTAL</span>
+                            <span id="summary-final-total">$ 0.00</span>
+                        </div>
+
+                        <button class="w-full bg-blue-600 text-white font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-700 transition-colors text-sm md:text-base disabled:bg-gray-400 disabled:cursor-not-allowed" disabled id="add-to-cart-btn">
+                            Añadir al carrito
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Contenido Principal -->
+                <main class="w-full md:flex-1">
+                    <h1 class="text-2xl md:text-3xl font-bold mb-5 md:mb-6">Configurar Producto</h1>
+
+                    <!-- Navegación de Pasos -->
+                    <nav class="flex border-b border-gray-300 mb-5 md:mb-6 overflow-x-auto">
+                        <button class="step-nav-btn p-3 md:p-4 text-sm md:text-base whitespace-nowrap flex-shrink-0 active" id="step-nav-1">1. Archivo</button>
+                        <button class="step-nav-btn p-3 md:p-4 text-sm md:text-base whitespace-nowrap flex-shrink-0 disabled" id="step-nav-2">2. Visor</button>
+                        <button class="step-nav-btn p-3 md:p-4 text-sm md:text-base whitespace-nowrap flex-shrink-0 disabled" id="step-nav-3">3. Configuración</button>
+                    </nav>
+
+                    <!-- Paso 1: Subir Archivo -->
+                    <div class="step-panel active" id="step-panel-1">
+                        <h2 class="text-lg md:text-xl font-semibold mb-4">Sube tu archivo</h2>
+                        <div class="drop-zone bg-white rounded-lg p-6 md:p-8 text-center border-2 border-dashed border-gray-300 transition-all duration-300" id="drop-zone">
+                            <input accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.ppt,.pptx,.xls,.xlsx" class="hidden" id="file-input" type="file">
+                            
+                            <div id="drop-zone-prompt">
+                                <div class="mb-4">
+                                    <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    </svg>
+                                </div>
+                                <p class="mb-4 text-sm md:text-base text-gray-600">Pulsa el botón o arrastra tu archivo aquí.</p>
+                                <label class="file-input-label inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 md:py-3 md:px-6 rounded-lg shadow-md text-sm md:text-base cursor-pointer transition-colors duration-300" for="file-input">
+                                    <svg class="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    </svg>
+                                    Subir archivo
+                                </label>
+                                <p class="text-xs md:text-sm text-gray-500 mt-4">Tamaño máx: <strong>100MB</strong></p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1">Formatos: PDF, Word, JPG, PPT, etc.</p>
+                            </div>
+
+                            <div class="hidden text-center" id="drop-zone-loading">
+                                <div class="mb-4">
+                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+                                </div>
+                                <p class="text-base md:text-lg font-semibold text-blue-600" id="loading-status-text">Subiendo...</p>
+                                <p class="text-xs md:text-sm text-gray-500 mt-1 truncate max-w-xs mx-auto" id="loading-file-name">&nbsp;</p>
+                            </div>
+                        </div>
+                        <p class="text-red-600 text-sm mt-3 md:mt-4 hidden" id="file-error-msg">&nbsp;</p>
+                    </div>
+
+                    <!-- Paso 2: Visor -->
+                    <div class="step-panel" id="step-panel-2">
+                        <h2 class="text-lg md:text-xl font-semibold mb-4">2. Visor de Archivo</h2>
+                        <p class="mb-4 text-sm md:text-base" id="visor-status-text">Archivo cargado.</p>
+                        
+                        <div class="bg-white rounded-lg shadow-md p-2 md:p-4 min-h-[300px] md:min-h-[400px]">
+                            <p class="text-gray-600 text-sm md:text-base p-4 hidden" id="visor-placeholder">No hay previsualización disponible.</p>
+                            <iframe class="w-full h-[400px] md:h-[600px] border hidden" id="file-visor-iframe" title="Visor de Archivo"></iframe>
+                            
+                            <!-- Visor PDF -->
+                            <div class="hidden" id="pdf-viewer">
+                                <div id="pdf-viewer-container" class="border border-gray-300 bg-gray-50 overflow-auto max-h-[500px] md:max-h-[600px]">
+                                    <canvas id="pdf-canvas" class="w-full border-b border-gray-300 block mx-auto"></canvas>
+                                </div>
+                                <div id="pdf-controls" class="flex justify-center items-center p-3 bg-gray-100">
+                                    <button class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed" disabled id="pdf-prev">← Ant</button>
+                                    <span class="text-sm mx-4 font-semibold" id="pdf-page-info">
+                                        Pág <span id="pdf-page-num">1</span> de <span id="pdf-page-count">1</span>
+                                    </span>
+                                    <button class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed" disabled id="pdf-next">Sig →</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="mt-4 md:mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow text-sm md:text-base transition-colors" id="visor-next-btn">Siguiente →</button>
+                    </div>
+
+                    <!-- Paso 3: Configuración -->
+                    <div class="step-panel" id="step-panel-3">
+                        <h2 class="text-lg md:text-xl font-semibold mb-4">3. Configuración</h2>
+                        <p class="mb-4 text-sm md:text-base">Define las opciones de impresión.</p>
+                        
+                        <div class="bg-white rounded-lg shadow-md p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            
+                            <!-- Número de Copias -->
+                            <div class="form-group">
+                                <label for="config-cantidad" class="block text-sm font-medium text-gray-700 mb-1">Número de Copias</label>
+                                <input id="config-cantidad" name="config-cantidad" type="number" value="1" min="1" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <!-- Páginas del Documento -->
+                            <div class="form-group hidden" id="config-pages-wrapper">
+                                <label for="config-pages" class="block text-sm font-medium text-gray-700 mb-1">Páginas del Documento</label>
+                                <input id="config-pages" name="config-pages" type="number" value="1" min="1" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-1" id="config-pages-help">Págs detectadas.</p>
+                            </div>
+
+                            <!-- Color -->
+                            <div class="form-group">
+                                <label for="config-color" class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+                                <select id="config-color" name="config-color" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="b/n">B/N</option>
+                                    <option value="color" selected>Color</option>
+                                </select>
+                            </div>
+
+                            <!-- Papel -->
+                            <div class="form-group">
+                                <label for="config-paper" class="block text-sm font-medium text-gray-700 mb-1">Papel</label>
+                                <select id="config-paper" name="config-paper" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="bond" selected>Bond</option>
+                                    <option value="opalina">Opalina</option>
+                                    <option value="couche">Couché</option>
+                                </select>
+                            </div>
+
+                            <!-- Tamaño -->
+                            <div class="form-group">
+                                <label for="config-size" class="block text-sm font-medium text-gray-700 mb-1">Tamaño</label>
+                                <select id="config-size" name="config-size" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="carta" selected>Carta</option>
+                                    <option value="oficio">Oficio</option>
+                                    <option value="tabloide">Tabloide</option>
+                                </select>
+                            </div>
+
+                            <!-- Caras -->
+                            <div class="form-group">
+                                <label for="config-sides" class="block text-sm font-medium text-gray-700 mb-1">Caras</label>
+                                <select id="config-sides" name="config-sides" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="una cara" selected>1 cara</option>
+                                    <option value="dos caras">2 caras (Dúplex)</option>
+                                </select>
+                            </div>
+
+                            <!-- Páginas a Imprimir -->
+                            <div class="form-group md:col-span-2">
+                                <label for="config-rango" class="block text-sm font-medium text-gray-700 mb-1">Páginas a Imprimir</label>
+                                <input id="config-rango" name="config-rango" type="text" placeholder="Ej: 1-5, 8, 11-12" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Opcional. Deja en blanco para imprimir todo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
         </section>
 
-        <!-- SECCIÓN 5: PAGO CONEKTA (Sigue igual) -->
-        <section id="payment-view" class="view hidden">
-            <!-- Contenido de pago... -->
-        </section>
-        
-        <!-- SECCIÓN 6: CONFIRMACIÓN DE PEDIDO (Sigue igual) -->
-        <section id="confirmation-view" class="view hidden">
-            <!-- Contenido de confirmación... -->
+        <!-- Vista Checkout -->
+        <section class="app-view" id="view-checkout">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block text-sm" data-target-view="view-home" href="#">← Seguir comprando</a>
+            
+            <h1 class="text-2xl md:text-3xl font-bold mb-5 md:mb-6">Confirmación de Pedido</h1>
+
+            <div class="flex flex-col md:flex-row md:gap-6 lg:gap-8">
+                <!-- Contenido Principal -->
+                <main class="w-full md:w-2/3 order-2 md:order-1">
+                    <h2 class="text-xl md:text-2xl font-semibold mb-4">Tu Pedido</h2>
+                    <div class="space-y-3 md:space-y-4" id="checkout-items-container">
+                        <p class="text-sm md:text-base text-gray-600">Cargando...</p>
+                    </div>
+
+                    <!-- Datos de Entrega -->
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mt-6 md:mt-8">
+                        <h2 class="text-xl md:text-2xl font-semibold mb-4">Datos de Entrega</h2>
+                        <form class="space-y-4" id="checkout-form">
+                            
+                            <!-- Nombre Completo -->
+                            <div class="form-group">
+                                <label for="checkout-nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                                <input id="checkout-nombre" name="checkout-nombre" type="text" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div class="form-group">
+                                <label for="checkout-email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
+                                <input id="checkout-email" name="checkout-email" type="email" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                       placeholder="ejemplo@correo.com">
+                                <p class="text-xs text-gray-500 mt-1">Recibirás la confirmación de tu pedido aquí</p>
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="form-group">
+                                <label for="checkout-telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                                <input id="checkout-telefono" name="checkout-telefono" type="tel" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                       placeholder="10 dígitos">
+                            </div>
+
+                            <!-- Sucursal -->
+                            <div class="form-group">
+                                <label for="checkout-sucursal" class="block text-sm font-medium text-gray-700 mb-1">Sucursal de Recolección *</label>
+                                <select id="checkout-sucursal" name="checkout-sucursal" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="" disabled selected>Selecciona una sucursal</option>
+                                    <option value="Sucursal 54">Sucursal 54</option>
+                                    <option value="Sucursal Relox">Sucursal Relox</option>
+                                    <option value="Sucursal Puebla">Sucursal Puebla</option>
+                                </select>
+                            </div>
+
+                            <input id="checkout-metodo" type="hidden" value="tienda">
+                        </form>
+                    </div>
+                </main>
+
+                <!-- Sidebar Resumen -->
+                <aside class="w-full md:w-1/3 order-1 md:order-2 mb-6 md:mb-0">
+                    <div class="bg-white rounded-lg shadow-lg p-4 md:p-6 md:sticky md:top-24">
+                        <h2 class="text-xl md:text-2xl font-semibold mb-4">Resumen de Pago</h2>
+                        
+                        <div class="space-y-1 md:space-y-2 border-b border-gray-200 pb-3 md:pb-4 text-sm md:text-base">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal:</span>
+                                <span class="font-semibold text-gray-900" id="checkout-subtotal">$ 0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Envío:</span>
+                                <span class="font-semibold text-green-600">Gratis (Recolección)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center py-3 md:py-4 text-base md:text-xl font-bold">
+                            <span>TOTAL:</span>
+                            <span id="checkout-total">$ 0.00</span>
+                        </div>
+
+                        <!-- Términos y Condiciones -->
+                        <div class="mt-3 md:mt-4">
+                            <label class="flex items-center cursor-pointer" for="terms-checkbox">
+                                <input class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" id="terms-checkbox" type="checkbox">
+                                <span class="ml-2 text-xs md:text-sm text-gray-600">
+                                    Acepto los <a class="app-link text-blue-600 hover:underline" data-target-view="view-terms" href="#">Términos y Condiciones</a>.
+                                </span>
+                            </label>
+                        </div>
+
+                        <button class="w-full bg-blue-600 text-white font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-700 transition-colors mt-3 md:mt-4 text-sm md:text-base disabled:bg-gray-400 disabled:cursor-not-allowed" 
+                                disabled id="submit-order-btn">
+                            Procesar Pedido
+                        </button>
+
+                        <div class="text-red-600 text-xs md:text-sm mt-3 md:mt-4 hidden" id="checkout-error-msg">&nbsp;</div>
+                        
+                        <!-- Indicador de Procesamiento -->
+                        <div class="text-center mt-4 hidden" id="processing-indicator">
+                            <div class="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-600"></div>
+                            <p class="text-sm text-gray-600 mt-2">Procesando pedido...</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </section>
 
-    </main>
+        <!-- Vista Agradecimiento -->
+        <section class="app-view" id="view-thanks">
+            <div class="bg-white rounded-lg shadow-xl p-6 md:p-12 text-center max-w-lg md:max-w-2xl mx-auto mt-8 md:mt-12">
+                <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                
+                <h1 class="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-green-700">¡Pedido Confirmado!</h1>
+                
+                <p class="text-gray-600 text-sm md:text-lg mb-5 md:mb-6">
+                    Tu pedido ha sido procesado exitosamente. Recibirás un correo de confirmación con todos los detalles.
+                </p>
 
-    <!-- Enlace al archivo JavaScript que subirás por separado -->
-    <script src="script.js"></script>
+                <div class="bg-gray-100 rounded-lg p-3 md:p-4 mb-6">
+                    <p class="text-gray-700 text-sm">Tu número de pedido:</p>
+                    <p class="text-xl md:text-2xl font-bold text-blue-700 mt-1" id="folio-number">LMN-XXXXX</p>
+                </div>
+
+                <div class="text-sm text-gray-600 mb-6">
+                    <p class="mb-2">📧 Revisa tu correo electrónico para más detalles</p>
+                    <p class="mb-2">🏪 Recolecta tu pedido en la sucursal seleccionada</p>
+                    <p>📞 Te contactaremos cuando esté listo</p>
+                </div>
+
+                <a class="app-link inline-block mt-6 md:mt-8 bg-blue-600 text-white font-bold py-2 px-5 md:py-3 md:px-6 rounded-lg shadow hover:bg-blue-700 transition-colors text-sm md:text-base" 
+                   data-target-view="view-home" href="#">
+                    Hacer otro pedido
+                </a>
+            </div>
+        </section>
+
+        <!-- Vista Términos -->
+        <section class="app-view" id="view-terms">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block text-sm" data-target-view="view-home" href="#">← Volver al inicio</a>
+            <div class="bg-white rounded-lg shadow-xl p-4 md:p-8">
+                <h1 class="text-2xl md:text-3xl font-bold mb-5 md:mb-6">Términos y Condiciones</h1>
+                <div class="prose max-w-none text-gray-700 text-sm md:text-base space-y-4">
+                    <p>Bienvenido a Impresión Lumen. Al usar nuestros servicios, aceptas estos términos.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">1. Uso del Servicio</h2>
+                    <p>El uso de este servicio implica la aceptación completa de estos términos y condiciones.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">2. Archivos y Derechos de Autor</h2>
+                    <p>Usted declara ser el propietario de los derechos de autor o tener permiso para reproducir los archivos enviados. No nos hacemos responsables por infracciones de copyright.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">3. Precios y Pagos</h2>
+                    <p>Los precios mostrados son indicativos y pueden variar según la configuración final. El precio definitivo se confirmará antes del pago.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">4. Entrega</h2>
+                    <p>La entrega se realizará exclusivamente en la sucursal seleccionada. Se le notificará cuando su pedido esté listo para recolección.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vista Privacidad -->
+        <section class="app-view" id="view-privacy">
+            <a class="app-link text-blue-600 hover:underline mb-4 inline-block text-sm" data-target-view="view-home" href="#">← Volver al inicio</a>
+            <div class="bg-white rounded-lg shadow-xl p-4 md:p-8">
+                <h1 class="text-2xl md:text-3xl font-bold mb-5 md:mb-6">Aviso de Privacidad</h1>
+                <div class="prose max-w-none text-gray-700 text-sm md:text-base space-y-4">
+                    <p>Nos comprometemos a proteger su privacidad y datos personales.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">Información Recopilada</h2>
+                    <p>Recopilamos su nombre, correo electrónico y teléfono para procesar su pedido y mantenerlo informado.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">Uso de la Información</h2>
+                    <p>Sus datos se usan exclusivamente para la gestión de su pedido, comunicación relacionada y mejora de nuestros servicios.</p>
+                    
+                    <h2 class="text-lg font-semibold mt-6 mb-3">Seguridad</h2>
+                    <p>Implementamos medidas de seguridad para proteger sus datos personales y archivos.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modales -->
+    
+    <!-- Modal Precios -->
+    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden" id="price-modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-5 md:p-6 relative">
+            <button class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-3xl font-light leading-none" id="close-price-modal-btn">&times;</button>
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Lista de Precios</h2>
+            <div class="text-gray-700 space-y-2 text-sm md:text-base max-h-[60vh] overflow-y-auto">
+                <p><strong>B/N (Carta, Bond, 1c):</strong> $1.30 / pág.</p>
+                <p><strong>Color (Carta, Láser, 1c):</strong> $15.00 / pág.</p>
+                <p><strong>Extra Opalina:</strong> Consultar</p>
+                <p><strong>Extra Couché:</strong> Consultar</p>
+                <p class="mt-4 text-xs md:text-sm text-gray-600">Precios finales calculados al configurar. Consulte para más detalles.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Añadido al Carrito -->
+    <div class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden" id="add-to-cart-modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-5 md:p-6 text-center">
+            <svg class="w-10 h-10 md:w-12 md:h-12 mx-auto text-green-500 mb-3 md:mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4">¡Añadido al Carrito!</h2>
+            <p class="text-gray-600 text-sm md:text-base mb-5 md:mb-6">Producto añadido exitosamente.</p>
+            <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
+                <button class="w-full bg-blue-600 text-white font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-700 text-sm md:text-base transition-colors" id="modal-go-to-cart-btn">
+                    Ir al carrito
+                </button>
+                <button class="w-full bg-white border-2 border-blue-600 text-blue-600 font-bold py-2 px-4 md:py-3 rounded-lg shadow hover:bg-blue-50 text-sm md:text-base transition-colors" id="modal-add-another-btn">
+                    Configurar otro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
 </body>
 </html>
